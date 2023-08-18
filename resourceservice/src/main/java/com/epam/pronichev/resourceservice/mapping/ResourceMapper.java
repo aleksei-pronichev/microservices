@@ -10,7 +10,7 @@ import org.mapstruct.Mapping;
 public interface ResourceMapper {
 
     @Mapping(target = "id", ignore = true)
-    Resource toModel(byte[] data);
+    Resource toModel(String cloudId);
 
     ResourceCreatedDto toCreatedDto(Resource savedResource);
 }

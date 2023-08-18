@@ -15,6 +15,6 @@ public class Resource {
     @Column("id")
     private Long id;
 
-    @Column("data")
-    private byte[] data;
+    @Column("cloud_id")
+    private String cloudId;
 }

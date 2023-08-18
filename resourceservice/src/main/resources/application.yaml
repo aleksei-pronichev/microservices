@@ -16,13 +16,14 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
 
-client:
-  metadata:
-    name: ${SONG_METADATA_NAME}
-
 eureka:
   client:
     serviceUrl:
       defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
   instance:
     preferIpAddress: true
+
+cloud:
+  s3:
+    url: ${S3_URL}
+    bucket: ${S3_BUCKET}

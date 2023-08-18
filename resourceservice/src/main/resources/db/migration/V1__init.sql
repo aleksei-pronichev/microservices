@@ -1,5 +1,5 @@
 CREATE TABLE audio_files
 (
-    id   BIGSERIAL PRIMARY KEY,
-    data BYTEA
+    id       BIGSERIAL PRIMARY KEY,
+    cloud_id VARCHAR
 );

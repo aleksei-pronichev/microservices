@@ -10,8 +10,13 @@ cd resourceservice
 mvn clean package -Dmaven.test.skip=true
 cd ..
 
-#build song service service
+#build song service
 cd songservice
+mvn clean package -Dmaven.test.skip=true
+cd ..
+
+#build resource processor
+cd resourceprocessor
 mvn clean package -Dmaven.test.skip=true
 cd ..
 

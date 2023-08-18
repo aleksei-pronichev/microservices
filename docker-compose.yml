@@ -63,6 +63,18 @@ services:
     ports:
       - "${SONG_DB_PORT}:5432"
 
+  resource-processor-backend:
+    image: resource-processor
+    build:
+      context: ./resourceprocessor
+      dockerfile: Dockerfile
+    ports:
+      - "${PROCESSOR_SERVICE_PORT}:${PROCESSOR_SERVICE_PORT}"
+    environment:
+      - SERVER_PORT=${PROCESSOR_SERVICE_PORT}
+      - PROCESSOR_SERVICE_NAME=${PROCESSOR_SERVICE_NAME}
+      - EUREKA_URI=http://eureka:${EUREKA_SERVICE_PORT}/eureka
+
   resource-backend:
     image: resource-service
     build:
@@ -78,10 +90,12 @@ services:
       - DB_NAME=${RESOURCE_DB_NAME}
       - DB_USER=${RESOURCE_DB_USER}
       - DB_PASSWORD=${RESOURCE_DB_PASSWORD}
-      - SONG_METADATA_NAME=${SONG_SERVICE_NAME}
       - EUREKA_URI=http://eureka:${EUREKA_SERVICE_PORT}/eureka
+      - S3_URL=http://resource-s3:4566
+      - S3_BUCKET=songs
     depends_on:
       - resource-postgres
+      - resource-s3
       - eureka
 
   resource-postgres:
@@ -93,3 +107,15 @@ services:
       - POSTGRES_PASSWORD=${RESOURCE_DB_PASSWORD}
     ports:
       - "${RESOURCE_DB_PORT}:5432"
+
+  resource-s3:
+    image: localstack/localstack
+    container_name: resource-s3
+    ports:
+      - "${RESOURCE_S3_PORT}:4566"
+      - "${RESOURCE_S3_SERVICE_PORT}:4571"
+    environment:
+      - SERVICES=s3
+      - DEBUG=1
+    volumes:
+      - "/tmp/localstack:/tmp/localstack"
