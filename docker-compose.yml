@@ -1,0 +1,95 @@
+version: '3.8'
+
+name: full-backend
+
+services:
+  eureka:
+    image: eureka
+    build:
+      context: ./eureka
+      dockerfile: Dockerfile
+    ports:
+      - "${EUREKA_SERVICE_PORT}:${EUREKA_SERVICE_PORT}"
+    environment:
+      - SERVER_PORT=${EUREKA_SERVICE_PORT}
+      
+  song-backend-1:
+    image: song-service
+    build:
+      context: ./songservice
+      dockerfile: Dockerfile
+    ports:
+      - "${SONG_SERVICE_PORT_1}:${SONG_SERVICE_PORT_1}"
+    environment:
+      - SERVER_PORT=${SONG_SERVICE_PORT_1}
+      - SONG_SERVICE_NAME=${SONG_SERVICE_NAME}
+      - DB_HOST=db_song
+      - DB_PORT=5432
+      - DB_NAME=${SONG_DB_NAME}
+      - DB_USER=${SONG_DB_USER}
+      - DB_PASSWORD=${SONG_DB_PASSWORD}
+      - EUREKA_URI=http://eureka:${EUREKA_SERVICE_PORT}/eureka
+    depends_on:
+      - song-postgres
+      - eureka
+
+  song-backen-2:
+    image: song-service
+    build:
+      context: ./songservice
+      dockerfile: Dockerfile
+    ports:
+      - "${SONG_SERVICE_PORT_2}:${SONG_SERVICE_PORT_2}"
+    environment:
+      - SERVER_PORT=${SONG_SERVICE_PORT_2}
+      - SONG_SERVICE_NAME=${SONG_SERVICE_NAME}
+      - DB_HOST=db_song
+      - DB_PORT=5432
+      - DB_NAME=${SONG_DB_NAME}
+      - DB_USER=${SONG_DB_USER}
+      - DB_PASSWORD=${SONG_DB_PASSWORD}
+      - EUREKA_URI=http://eureka:${EUREKA_SERVICE_PORT}/eureka
+    depends_on:
+      - song-postgres
+      - eureka
+
+  song-postgres:
+    image: postgres:11.19-alpine
+    container_name: db_song
+    environment:
+      - POSTGRES_DB=${SONG_DB_NAME}
+      - POSTGRES_USER=${SONG_DB_USER}
+      - POSTGRES_PASSWORD=${SONG_DB_PASSWORD}
+    ports:
+      - "${SONG_DB_PORT}:5432"
+
+  resource-backend:
+    image: resource-service
+    build:
+      context: ./resourceservice
+      dockerfile: Dockerfile
+    ports:
+      - "${RESOURCE_SERVICE_PORT}:${RESOURCE_SERVICE_PORT}"
+    environment:
+      - SERVER_PORT=${RESOURCE_SERVICE_PORT}
+      - RESOURCE_SERVICE_NAME=${RESOURCE_SERVICE_NAME}
+      - DB_HOST=db_resource
+      - DB_PORT=5432
+      - DB_NAME=${RESOURCE_DB_NAME}
+      - DB_USER=${RESOURCE_DB_USER}
+      - DB_PASSWORD=${RESOURCE_DB_PASSWORD}
+      - SONG_METADATA_NAME=${SONG_SERVICE_NAME}
+      - EUREKA_URI=http://eureka:${EUREKA_SERVICE_PORT}/eureka
+    depends_on:
+      - resource-postgres
+      - eureka
+
+  resource-postgres:
+    image: postgres:11.19-alpine
+    container_name: db_resource
+    environment:
+      - POSTGRES_DB=${RESOURCE_DB_NAME}
+      - POSTGRES_USER=${RESOURCE_DB_USER}
+      - POSTGRES_PASSWORD=${RESOURCE_DB_PASSWORD}
+    ports:
+      - "${RESOURCE_DB_PORT}:5432"
